@@ -5,12 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-# 1. Parâmetros globais
 SEED = 42
 np.random.seed(SEED)
 random.seed(SEED)
 
-# 2. Dados simulados da PETR4 (offline)
 data = pd.DataFrame({
     'Open':   [25.10, 25.60, 26.00, 25.90, 26.20, 26.50, 26.40, 26.80, 27.10, 27.00],
     'High':   [25.70, 26.10, 26.50, 26.30, 26.80, 26.90, 26.70, 27.00, 27.30, 27.20],
@@ -19,7 +17,6 @@ data = pd.DataFrame({
     'Volume': [1000000, 1200000, 1100000, 1150000, 1250000, 1300000, 1270000, 1350000, 1400000, 1380000]
 })
 
-# 3. Lógica simplificada de simulação de trades
 class SimpleTradingSim:
     def __init__(self, df, initial_balance=10000):
         self.df = df.reset_index()
@@ -36,12 +33,12 @@ class SimpleTradingSim:
         row = self.df.iloc[index]
         action = self.decide_action(index)
 
-        if action == 1:  # Buy
+        if action == 1: 
             shares_bought = int(self.balance // row['Close'])
             self.balance -= shares_bought * row['Close']
             self.shares_held += shares_bought
 
-        elif action == 2:  # Sell
+        elif action == 2: 
             self.balance += self.shares_held * row['Close']
             self.shares_held = 0
 
@@ -59,25 +56,22 @@ class SimpleTradingSim:
         if index == 0:
             return 0
         if self.df.iloc[index]['Close'] > self.df.iloc[index - 1]['Close']:
-            return 1  # Buy
+            return 1  
         elif self.df.iloc[index]['Close'] < self.df.iloc[index - 1]['Close']:
-            return 2  # Sell
+            return 2  
         else:
-            return 0  # Hold
+            return 0  
 
     def run(self):
         for i in range(len(self.df)):
             self.step(i)
         return pd.DataFrame(self.history)
 
-# 4. Executa simulação
 sim = SimpleTradingSim(data)
 resultados = sim.run()
 
-# 5. Mostra tabela de resultados
 print(resultados[['Dia', 'Acao', 'Preco', 'Saldo', 'Acoes', 'Patrimonio']])
 
-# 6. Gráfico do resultado
 plt.figure(figsize=(10, 5))
 plt.plot(resultados['Dia'], resultados['Patrimonio'], marker='o', linestyle='-')
 plt.title("Evolução do Patrimônio - Simulação PETR4")
